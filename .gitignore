@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+backend/node_modules/
+
+# Logs & Temporary files
+*.log
+be.log
+be.err.log
+fe.log
+fe.err.log
+*.zip
+*.tar.gz
+
+# Production builds
+frontend/dist/
+backend/public/assets/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
