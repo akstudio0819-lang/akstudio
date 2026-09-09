@@ -7,17 +7,18 @@ export const FoldcraftHero: React.FC = () => {
   const location = useLocation();
 
   const navLinks = [
-    { name: 'Home', path: '/' },
-    { name: 'About', path: '/about' },
+    { name: 'Home',     path: '/' },
+    { name: 'About',    path: '/about' },
     { name: 'Services', path: '/services' },
-    { name: 'Work', path: '/portfolio' },
-    { name: 'Reviews', path: '/reviews' },
-    { name: 'Contact', path: '/contact' },
+    { name: 'Work',     path: '/portfolio' },
+    { name: 'Reviews',  path: '/reviews' },
+    { name: 'Contact',  path: '/contact' },
   ];
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden bg-black font-geist">
-      {/* Video Background (no z-index) */}
+
+      {/* ── Video Background ────────────────────────────────────────────── */}
       <video
         autoPlay
         muted
@@ -31,28 +32,31 @@ export const FoldcraftHero: React.FC = () => {
         />
       </video>
 
-      {/* Navbar (z-30) */}
+      {/* ── Dark Gradient Overlay (for text readability) ────────────────── */}
+      <div className="absolute inset-0 z-[5] bg-gradient-to-r from-black/80 via-black/40 to-transparent pointer-events-none" />
+
+      {/* ── Navbar (z-30) - Reference design matching uploaded image ─────── */}
       <nav className="relative z-30 flex items-center justify-between px-6 py-4 md:px-10 lg:px-16">
-        {/* Left Side: AK Logo + Brand Name */}
+
+        {/* Left Side: AK Logo Icon + AK Studio Text */}
         <Link to="/" className="flex items-center gap-2.5 flex-shrink-0">
-          {/* AK Gradient Logo Box */}
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-cyan-400 shadow-lg shadow-blue-500/20">
             <span className="text-sm font-bold text-white tracking-tight">AK</span>
           </div>
           <span className="text-[15px] font-semibold text-white tracking-tight">AK Studio</span>
         </Link>
 
-        {/* Center: Desktop Nav Links */}
-        <div className="hidden items-center gap-7 md:flex absolute left-1/2 -translate-x-1/2">
+        {/* Center: Desktop Nav Links (Centered horizontally) */}
+        <div className="hidden items-center gap-8 md:flex absolute left-1/2 -translate-x-1/2">
           {navLinks.map((link) => {
             const isActive = location.pathname === link.path;
             return (
               <Link
                 key={link.name}
                 to={link.path}
-                className={`text-sm transition-colors ${
+                className={`text-sm transition-colors relative py-1 ${
                   isActive
-                    ? 'text-white font-semibold underline underline-offset-4 decoration-white/60'
+                    ? 'text-white font-semibold border-b-2 border-cyan-400'
                     : 'text-white/70 hover:text-white font-normal'
                 }`}
               >
@@ -62,8 +66,8 @@ export const FoldcraftHero: React.FC = () => {
           })}
         </div>
 
-        {/* Right Side Desktop: Sign In + Start a Project */}
-        <div className="hidden md:flex items-center gap-4">
+        {/* Right Side Desktop: Sign In + Start a Project ↗ Button */}
+        <div className="hidden md:flex items-center gap-6">
           <Link
             to="/login"
             className="text-sm text-white/80 hover:text-white transition-colors font-medium"
@@ -99,7 +103,7 @@ export const FoldcraftHero: React.FC = () => {
         </button>
       </nav>
 
-      {/* Mobile Menu (z-20) */}
+      {/* ── Mobile Menu (z-20) ──────────────────────────────────────────── */}
       <div
         className={`absolute inset-x-0 top-0 z-20 bg-black/98 backdrop-blur-xl transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
           mobileMenuOpen
@@ -146,7 +150,7 @@ export const FoldcraftHero: React.FC = () => {
         </div>
       </div>
 
-      {/* Hero Content (z-10) */}
+      {/* ── Hero Content (z-10) ─────────────────────────────────────────── */}
       <div className="relative z-10 flex min-h-[calc(100vh-80px)] flex-col justify-center px-6 py-12 md:px-12 lg:px-16 max-w-4xl">
         {/* Top Badge */}
         <p className="mb-4 text-xs font-semibold uppercase tracking-wider text-cyan-400 sm:text-sm animate-[fadeSlideUp_0.8s_ease_0.2s_both]">
