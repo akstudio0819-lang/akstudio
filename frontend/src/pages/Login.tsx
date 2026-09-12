@@ -137,23 +137,12 @@ export const Login: React.FC = () => {
           </button>
         </form>
 
-        {/* Register & Admin Links */}
-        <div className="space-y-3 pt-2 border-t border-studio-border/60">
-          <div className="text-center text-xs text-studio-text">
-            Don't have an account?{' '}
-            <Link to="/register" className="text-accent-cyan hover:text-studio-white transition-colors font-semibold">
-              Create Account
-            </Link>
-          </div>
-
-          <div className="text-center">
-            <Link
-              to="/admin-credentials"
-              className="inline-flex items-center gap-1.5 text-xs text-cyan-400/90 hover:text-cyan-300 font-mono bg-cyan-500/10 hover:bg-cyan-500/20 border border-cyan-500/30 px-3 py-1.5 rounded transition-all"
-            >
-              <span>🔑 Admin Credentials &amp; Quick Sign In Portal</span>
-            </Link>
-          </div>
+        {/* Register Link */}
+        <div className="text-center text-xs text-studio-text pt-2 border-t border-studio-border/60">
+          Don't have an account?{' '}
+          <Link to="/register" className="text-accent-cyan hover:text-studio-white transition-colors font-semibold">
+            Create Account
+          </Link>
         </div>
       </div>
     </div>
