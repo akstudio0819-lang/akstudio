@@ -36,7 +36,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.user) {
             const email = session.user.email || '';
-            const userRole: UserRole = email.toLowerCase().endsWith('@akstudio.com') || email === 'admin@akstudio.com' ? 'admin' : 'client';
+            const userRole: UserRole = email.toLowerCase().endsWith('@akstudio.com') || email.toLowerCase() === 'admin@akstudio.com' || email.toLowerCase() === 'akstudio0819@gmail.com' ? 'admin' : 'client';
             
             setUser({
               id: session.user.id,
@@ -63,7 +63,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (session?.user) {
           const email = session.user.email || '';
-          const userRole: UserRole = email.toLowerCase().endsWith('@akstudio.com') || email === 'admin@akstudio.com' ? 'admin' : 'client';
+          const userRole: UserRole = email.toLowerCase().endsWith('@akstudio.com') || email.toLowerCase() === 'admin@akstudio.com' || email.toLowerCase() === 'akstudio0819@gmail.com' ? 'admin' : 'client';
           setUser({
             id: session.user.id,
             email,
@@ -89,7 +89,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) return { error: error.message };
       
-      const userRole: UserRole = email.toLowerCase().endsWith('@akstudio.com') || email === 'admin@akstudio.com' ? 'admin' : 'client';
+      const userRole: UserRole = email.toLowerCase().endsWith('@akstudio.com') || email.toLowerCase() === 'admin@akstudio.com' || email.toLowerCase() === 'akstudio0819@gmail.com' ? 'admin' : 'client';
       return { error: null, role: userRole };
     }
     return { error: 'Supabase client not available' };
@@ -106,7 +106,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       if (error) return { error: error.message };
 
       if (data.user) {
-        const userRole: UserRole = email.toLowerCase().endsWith('@akstudio.com') || email === 'admin@akstudio.com' ? 'admin' : 'client';
+        const userRole: UserRole = email.toLowerCase().endsWith('@akstudio.com') || email.toLowerCase() === 'admin@akstudio.com' || email.toLowerCase() === 'akstudio0819@gmail.com' ? 'admin' : 'client';
 
         // Insert profile (ignore duplicate error if user already exists)
         await supabase.from('profiles').upsert([{
