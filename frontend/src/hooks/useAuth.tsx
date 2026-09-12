@@ -97,10 +97,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const register = async (name: string, email: string, password: string) => {
     if (supabase) {
+      const redirectUrl = typeof window !== 'undefined' && window.location.origin.includes('akstudiio.site')
+        ? 'https://akstudiio.site/login'
+        : (typeof window !== 'undefined' ? `${window.location.origin}/login` : 'https://akstudiio.site/login');
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
-        options: { data: { name } }
+        options: {
+          data: { name },
+          emailRedirectTo: redirectUrl
+        }
       });
 
       if (error) return { error: error.message };
