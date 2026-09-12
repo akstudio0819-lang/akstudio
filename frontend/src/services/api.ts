@@ -362,13 +362,13 @@ export const api = {
   submitContact: async (enquiry: Omit<ContactEnquiry, '_id' | 'status' | 'createdAt'>): Promise<ContactEnquiry> => {
     // 1. Send HTTP request to Backend API (which triggers Nodemailer to akstudio0819@gmail.com)
     try {
-      fetch('/api/contact', {
+      await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(enquiry)
-      }).catch(err => console.log('Backend email dispatch notice:', err));
+      });
     } catch (e) {
-      console.log('Backend contact post ignored:', e);
+      console.log('Backend contact post notice:', e);
     }
 
     // 2. Save to Supabase DB
