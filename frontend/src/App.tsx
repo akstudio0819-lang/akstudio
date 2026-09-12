@@ -23,6 +23,7 @@ import { NotFound } from './pages/NotFound';
 import { Login } from './pages/Login';
 import { Register } from './pages/Register';
 import { ForgotPassword } from './pages/ForgotPassword';
+import { AdminCredentials } from './pages/AdminCredentials';
 
 // Protected Dashboards
 import { ClientDashboard } from './pages/ClientDashboard';
@@ -54,6 +55,7 @@ function App() {
             <Route path="login" element={<Login />} />
             <Route path="register" element={<Register />} />
             <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="admin-credentials" element={<AdminCredentials />} />
 
             {/* Protected Routes */}
             <Route 
