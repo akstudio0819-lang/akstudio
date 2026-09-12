@@ -44,6 +44,12 @@ app.use('/api', limiter);
 
 app.use(express.json());
 
+// Phusion Passenger Health Check Route (Fixes cPanel startup Content-Type header checks)
+app.get('/_health', (req, res) => {
+  res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+  res.status(200).send('OK');
+});
+
 // API Routes
 app.use('/api/projects', projectRoutes);
 app.use('/api/reviews', reviewRoutes);
@@ -66,15 +72,21 @@ app.get('/api/admin/stats', (req, res) => {
 // Serve static frontend files in production (if public/ dist folder exists)
 const publicPath = path.join(__dirname, '../public');
 if (fs.existsSync(publicPath)) {
-  app.use(express.static(publicPath));
+  app.use(express.static(publicPath, {
+    setHeaders: (res) => {
+      res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    }
+  }));
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api')) return next();
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     res.sendFile(path.join(publicPath, 'index.html'));
   });
 } else {
-  // Health check
+  // Health check fallback
   app.get('/', (req, res) => {
-    res.json({ message: 'AK Studio REST API Engine Active', timestamp: new Date().toISOString() });
+    res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    res.status(200).send('<html><body>AK Studio API Active</body></html>');
   });
 }
 
