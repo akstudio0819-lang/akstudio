@@ -1,48 +1,56 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
-import { Mail, Lock, User, AlertCircle, Check, Eye, EyeOff, Info } from 'lucide-react';
+import { Mail, Lock, User, AlertCircle, Check, Info, Eye, EyeOff } from 'lucide-react';
 
 export const Register: React.FC = () => {
   const navigate = useNavigate();
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
 
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [emailConfirmRequired, setEmailConfirmRequired] = useState(false);
 
-  // Password strength indicator
-  const getPasswordStrength = (pw: string) => {
-    if (!pw) return { label: '', color: '', width: '0%' };
-    if (pw.length < 6) return { label: 'Too short', color: 'bg-red-500', width: '20%' };
-    if (pw.length < 8) return { label: 'Weak', color: 'bg-orange-400', width: '40%' };
-    if (/[A-Z]/.test(pw) && /[0-9]/.test(pw) && pw.length >= 8) return { label: 'Strong', color: 'bg-green-400', width: '100%' };
-    return { label: 'Medium', color: 'bg-yellow-400', width: '70%' };
+  // Password strength calculation
+  const getPasswordStrength = (pass: string) => {
+    let score = 0;
+    if (pass.length >= 6) score += 1;
+    if (pass.length >= 8) score += 1;
+    if (/[A-Z]/.test(pass)) score += 1;
+    if (/[0-9]/.test(pass)) score += 1;
+    if (/[^A-Za-z0-9]/.test(pass)) score += 1;
+    return score;
   };
+
   const strength = getPasswordStrength(password);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !password || !confirmPassword) return;
 
-    if (password.length < 6) {
-      setErrorMsg('Password must be at least 6 characters.');
+    if (password !== confirmPassword) {
+      setErrorMsg('Passwords do not match. Please verify both fields.');
       return;
     }
-    if (password !== confirmPassword) {
-      setErrorMsg('Passwords do not match.');
+
+    if (password.length < 6) {
+      setErrorMsg('Password must be at least 6 characters long.');
       return;
     }
 
     setLoading(true);
     setErrorMsg(null);
+
     try {
       const res = await register(name, email, password);
       if (res.error) {
@@ -56,11 +64,9 @@ export const Register: React.FC = () => {
           setErrorMsg(res.error);
         }
       } else if (res.emailConfirmRequired) {
-        // Email confirmation required — show message, user must confirm before signing in
         setSuccess(true);
         setEmailConfirmRequired(true);
       } else {
-        // Auto sign-in succeeded — go straight to dashboard
         setSuccess(true);
         setEmailConfirmRequired(false);
         setTimeout(() => {
@@ -74,8 +80,20 @@ export const Register: React.FC = () => {
     }
   };
 
-
-
+  const handleGoogleSignup = async () => {
+    setGoogleLoading(true);
+    setErrorMsg(null);
+    try {
+      const res = await loginWithGoogle();
+      if (res.error) {
+        setErrorMsg(res.error);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Google Sign-Up failed. Please try again.');
+    } finally {
+      setGoogleLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center py-12 px-4 bg-black font-geist">
@@ -139,6 +157,40 @@ export const Register: React.FC = () => {
 
         {!success && (
           <>
+            {/* Google Sign-Up Button */}
+            <button
+              type="button"
+              onClick={handleGoogleSignup}
+              disabled={googleLoading}
+              className="w-full bg-studio-black hover:bg-studio-dark border border-studio-border text-white py-3 rounded-lg font-medium text-sm transition-all duration-300 flex items-center justify-center gap-3 hover:border-accent-cyan/50"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24">
+                <path
+                  fill="#EA4335"
+                  d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"
+                />
+                <path
+                  fill="#4285F4"
+                  d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12s.7 2.3 1.9 4.7l3.7-1.9z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"
+                />
+              </svg>
+              <span>{googleLoading ? 'Connecting to Google...' : 'Sign Up with Google'}</span>
+            </button>
+
+            {/* Divider */}
+            <div className="relative flex items-center justify-center my-2">
+              <div className="border-t border-studio-border/60 w-full" />
+              <span className="bg-studio-card px-3 text-[10px] uppercase font-mono text-studio-text/60 absolute">Or Email</span>
+            </div>
+
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Full Name */}
               <div className="space-y-1">
@@ -172,7 +224,7 @@ export const Register: React.FC = () => {
                 />
               </div>
 
-              {/* Password with Eye Toggle */}
+              {/* Password */}
               <div className="space-y-1">
                 <label className="text-xs uppercase font-mono text-studio-text font-bold flex items-center gap-1.5">
                   <Lock size={11} />
@@ -182,10 +234,10 @@ export const Register: React.FC = () => {
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
-                    placeholder="Min. 6 characters"
+                    placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full bg-black border border-studio-border px-4 py-2.5 pr-11 rounded-lg text-sm text-studio-white focus:outline-none focus:border-accent-cyan transition-colors placeholder:text-studio-text/40"
+                    className="w-full bg-black border border-studio-border px-4 py-2.5 pr-10 rounded-lg text-sm text-studio-white focus:outline-none focus:border-accent-cyan transition-colors placeholder:text-studio-text/40"
                   />
                   <button
                     type="button"
@@ -196,21 +248,24 @@ export const Register: React.FC = () => {
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {/* Password Strength Bar */}
-                {password && (
-                  <div className="space-y-1 pt-1">
-                    <div className="h-1 w-full bg-studio-border rounded-full overflow-hidden">
-                      <div
-                        className={`h-full rounded-full transition-all duration-300 ${strength.color}`}
-                        style={{ width: strength.width }}
-                      />
+
+                {/* Password Strength Meter */}
+                {password.length > 0 && (
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex gap-1 h-1">
+                      <div className={`h-full flex-1 rounded-full transition-colors ${strength >= 1 ? 'bg-red-500' : 'bg-studio-border'}`} />
+                      <div className={`h-full flex-1 rounded-full transition-colors ${strength >= 2 ? 'bg-orange-500' : 'bg-studio-border'}`} />
+                      <div className={`h-full flex-1 rounded-full transition-colors ${strength >= 3 ? 'bg-yellow-500' : 'bg-studio-border'}`} />
+                      <div className={`h-full flex-1 rounded-full transition-colors ${strength >= 4 ? 'bg-green-500' : 'bg-studio-border'}`} />
                     </div>
-                    <p className="text-[10px] text-studio-text font-mono">{strength.label}</p>
+                    <p className="text-[10px] font-mono text-studio-text">
+                      Strength: {strength <= 1 ? 'Weak' : strength <= 3 ? 'Medium' : 'Strong'}
+                    </p>
                   </div>
                 )}
               </div>
 
-              {/* Confirm Password with Eye Toggle */}
+              {/* Confirm Password */}
               <div className="space-y-1">
                 <label className="text-xs uppercase font-mono text-studio-text font-bold flex items-center gap-1.5">
                   <Lock size={11} />
@@ -220,14 +275,14 @@ export const Register: React.FC = () => {
                   <input
                     type={showConfirmPassword ? 'text' : 'password'}
                     required
-                    placeholder="Re-enter your password"
+                    placeholder="••••••••"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className={`w-full bg-black border px-4 py-2.5 pr-11 rounded-lg text-sm text-studio-white focus:outline-none transition-colors placeholder:text-studio-text/40 ${
-                      confirmPassword && confirmPassword !== password
-                        ? 'border-red-500/60 focus:border-red-500'
-                        : confirmPassword && confirmPassword === password
-                        ? 'border-green-500/60 focus:border-green-400'
+                    className={`w-full bg-black border px-4 py-2.5 pr-10 rounded-lg text-sm text-studio-white focus:outline-none transition-colors placeholder:text-studio-text/40 ${
+                      confirmPassword.length > 0
+                        ? confirmPassword === password
+                          ? 'border-green-500/60 focus:border-green-500'
+                          : 'border-red-500/60 focus:border-red-500'
                         : 'border-studio-border focus:border-accent-cyan'
                     }`}
                   />
@@ -240,13 +295,8 @@ export const Register: React.FC = () => {
                     {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
-                {confirmPassword && confirmPassword !== password && (
+                {confirmPassword.length > 0 && confirmPassword !== password && (
                   <p className="text-[10px] text-red-400 font-mono">Passwords do not match</p>
-                )}
-                {confirmPassword && confirmPassword === password && (
-                  <p className="text-[10px] text-green-400 font-mono flex items-center gap-1">
-                    <Check size={10} /> Passwords match
-                  </p>
                 )}
               </div>
 
@@ -269,17 +319,15 @@ export const Register: React.FC = () => {
                 )}
               </button>
             </form>
-          </>
-        )}
 
-        {/* Sign In Link */}
-        {!success && (
-          <div className="text-center text-xs text-studio-text pt-1">
-            Already have an account?{' '}
-            <Link to="/login" className="text-accent-cyan hover:text-studio-white transition-colors font-semibold">
-              Sign In Here
-            </Link>
-          </div>
+            {/* Login Link */}
+            <div className="text-center text-xs text-studio-text pt-2 border-t border-studio-border/60">
+              Already have an account?{' '}
+              <Link to="/login" className="text-accent-cyan hover:text-studio-white transition-colors font-semibold">
+                Sign In
+              </Link>
+            </div>
+          </>
         )}
       </div>
     </div>

@@ -8,13 +8,17 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 export const isSupabaseConfigured = true;
 
 /**
- * Helper to easily initiate Google OAuth sign-in when configured in Supabase Console
+ * Helper to initiate Google OAuth sign-in / sign-up via Supabase Auth
  */
 export const signInWithGoogle = async () => {
+  const redirectUrl = typeof window !== 'undefined' && window.location.origin.includes('akstudiio.site')
+    ? 'https://akstudiio.site/dashboard'
+    : (typeof window !== 'undefined' ? `${window.location.origin}/dashboard` : 'https://akstudiio.site/dashboard');
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/dashboard`
+      redirectTo: redirectUrl
     }
   });
   return { data, error };

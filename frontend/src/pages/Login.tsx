@@ -5,12 +5,13 @@ import { Mail, Lock, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 export const Login: React.FC = () => {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -21,7 +22,6 @@ export const Login: React.FC = () => {
     try {
       const res = await login(email, password);
       if (res.error) {
-        // Friendly error messages
         if (res.error.toLowerCase().includes('invalid login credentials') || res.error.toLowerCase().includes('invalid credentials')) {
           setErrorMsg('Incorrect email or password. Please try again.');
         } else if (res.error.toLowerCase().includes('email not confirmed')) {
@@ -42,6 +42,21 @@ export const Login: React.FC = () => {
       setErrorMsg(err.message || 'An unexpected error occurred. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleGoogleLogin = async () => {
+    setGoogleLoading(true);
+    setErrorMsg(null);
+    try {
+      const res = await loginWithGoogle();
+      if (res.error) {
+        setErrorMsg(res.error);
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Google Sign-In failed. Please try again.');
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
@@ -67,6 +82,40 @@ export const Login: React.FC = () => {
             <span>{errorMsg}</span>
           </div>
         )}
+
+        {/* Google OAuth Button */}
+        <button
+          type="button"
+          onClick={handleGoogleLogin}
+          disabled={googleLoading}
+          className="w-full bg-studio-black hover:bg-studio-dark border border-studio-border text-white py-3 rounded-lg font-medium text-sm transition-all duration-300 flex items-center justify-center gap-3 hover:border-accent-cyan/50"
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24">
+            <path
+              fill="#EA4335"
+              d="M12 5c1.6 0 3 .6 4.1 1.6l3.1-3.1C17.3 1.7 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.3 9 5 12 5z"
+            />
+            <path
+              fill="#4285F4"
+              d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"
+            />
+            <path
+              fill="#FBBC05"
+              d="M5.6 14.8c-.2-.7-.4-1.5-.4-2.3s.2-1.6.4-2.3L1.9 7.3C.7 9.7 0 10.8 0 12s.7 2.3 1.9 4.7l3.7-1.9z"
+            />
+            <path
+              fill="#34A853"
+              d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.3-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"
+            />
+          </svg>
+          <span>{googleLoading ? 'Connecting to Google...' : 'Sign In with Google'}</span>
+        </button>
+
+        {/* Divider */}
+        <div className="relative flex items-center justify-center my-2">
+          <div className="border-t border-studio-border/60 w-full" />
+          <span className="bg-studio-card px-3 text-[10px] uppercase font-mono text-studio-text/60 absolute">Or Email</span>
+        </div>
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -101,10 +150,10 @@ export const Login: React.FC = () => {
               <input
                 type={showPassword ? 'text' : 'password'}
                 required
-                placeholder="Enter your password"
+                placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-black border border-studio-border px-4 py-2.5 pr-11 rounded-lg text-sm text-studio-white focus:outline-none focus:border-accent-cyan transition-colors placeholder:text-studio-text/40"
+                className="w-full bg-black border border-studio-border px-4 py-2.5 pr-10 rounded-lg text-sm text-studio-white focus:outline-none focus:border-accent-cyan transition-colors placeholder:text-studio-text/40"
               />
               <button
                 type="button"
